@@ -1,8 +1,7 @@
 # Uses the geocoder gem for location lat/long
 require 'geocoder'
-# Uses the net/http gem for stability over speed
-# Maybe this can be improved upon in later revisions
-require 'net/http'
+# Uses the net/http gem for api requests
+require 'httparty'
 # Uses the json gem for parsing request results
 require 'json'
 
@@ -12,18 +11,20 @@ class DarkSky
 		@key = key
 		@location = location
 
+		# Configure units, coordinates (Geocoder) and request_url
 		configure()
 	end
 
 	def configure()
 		@units = 'auto'
-		@coordinates = Geocoder.coordinates(@location) # tuple of latitude and longitude
+		@coordinates = Geocoder.coordinates @location # Tuple of latitude and longitude
 		@request_url = "https://api.darksky.net/forecast/#{@key}/#{@coordinates[0]},#{@coordinates[1]}?units=#{@units}";
 	end
 
-	def getWeatherAlerts()
-		requestTemp = @request_url + '&exclude=[currently,minutely,hourly,daily,flags]'
-		result = makeRequest(requestTemp)
+	def getCurrentWeather()
+		requestTemp = @request_url + '&exclude=[minutely,hourly,daily,flags,alerts]'
+		result = makeRequest requestTemp
+		puts result
 	end
 
 	def setLocation(location)
@@ -32,11 +33,11 @@ class DarkSky
 	end
 
 	def makeRequest(url)
-		uri = URI(url)
-		response = Net::HTTP.get(uri)
-		return JSON.parse(response)
+		response = HTTParty.get url, verify: false # Dont need SSL certificate (better way than using HTTParty?)
+		return JSON.parse response.body, symbolize_names:true # Return a Hash of the JSON result
 	end
 
+	# Utilities
 	def getLocation
 		return @location
 	end

@@ -21,8 +21,32 @@ class DarkSky
 		@request_url = "https://api.darksky.net/forecast/#{@key}/#{@coordinates[0]},#{@coordinates[1]}?units=#{@units}";
 	end
 
-	def getCurrentWeather()
+	def getCurrent()
 		requestTemp = @request_url + '&exclude=[minutely,hourly,daily,flags,alerts]'
+		result = makeRequest requestTemp
+		puts result
+	end
+
+	def getMinutely()
+		requestTemp = @request_url + '&exclude=[currently,hourly,daily,flags,alerts]'
+		result = makeRequest requestTemp
+		puts result
+	end
+
+	def getHourly()
+		requestTemp = @request_url + '&exclude=[currently,minutely,daily,flags,alerts]'
+		result = makeRequest requestTemp
+		puts result
+	end
+
+	def getDaily()
+		requestTemp = @request_url + '&exclude=[currently,minutely,hourly,flags,alerts]'
+		result = makeRequest requestTemp
+		puts result
+	end
+
+	def getWeatherAlerts()
+		requestTemp = @request_url + '&exclude=[currently,minutely,hourly,daily,flags]'
 		result = makeRequest requestTemp
 		puts result
 	end
